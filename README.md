@@ -26,7 +26,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
-    - uses: cloudposse/github-action-pre-commit@v2.1.2
+    - uses: makeshift/github-action-pre-commit@v2.1.2
 ```
 
 This does a few things:
@@ -84,3 +84,10 @@ while you could _technically_ configure this for a public repository (using a
 personal access token), I can't think of a way to do this safely without
 exposing a privileged token to pull requests -- if you have any ideas, please
 leave an issue!
+
+## additions by Makeshift
+
+- `cancel_if_changed` ('true' by default) - If true, will cancel this workflow run if pre-commit makes any changes to the repo.
+- `start_if_changed` ('true' by default) - If true, will start a new invocation of this workflow run if pre-commit makes any changes to the repo.
+
+If both are true, then the current run will be cancelled and replaced with a new run with the changes made by pre-commit.

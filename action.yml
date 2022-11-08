@@ -1,6 +1,8 @@
-name: cloudposse-pre-commit
-description: run pre-commit and optionally commit back to the pull request
-author: 'Cloud Posse <hello@cloudposse.com>'
+name: pre-commit-cancel-if-changed
+description:
+  run pre-commit and optionally commit back to the pull request, and optionally cancel this workflow run if the pre-commit hook changed any
+  files
+author: 'Makeshift'
 branding:
   icon: 'activity'
   color: 'blue'
@@ -24,6 +26,14 @@ inputs:
     description: github commit message to push with
     required: false
     default: 'pre-commit fixes'
+  cancel_if_changed:
+    description: cancel this workflow run if the pre-commit hook changed any files
+    required: false
+    default: 'true'
+  start_if_changed:
+    description: start a new workflow run if the pre-commit hook changed any files
+    required: false
+    default: 'true'
 
 runs:
   using: 'node16'

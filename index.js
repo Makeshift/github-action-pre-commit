@@ -47,8 +47,11 @@ async function main() {
     const git_user_name = core.getInput('git_user_name');
     const git_user_email = core.getInput('git_user_email');
     const git_commit_message = core.getInput('git_commit_message');
+    const cancel_if_changed = core.getInput('cancel_if_changed') === 'true';
+    const start_if_changed = core.getInput('start_if_changed') === 'true';
     const pr = github.context.payload.pull_request;
     const push = !!token && !!pr;
+    const octokit = github.getOctokit(token);
 
     const ret = await exec.exec('pre-commit', args, {ignoreReturnCode: push});
 
@@ -75,6 +78,25 @@ async function main() {
                 const url = addToken(pr.head.repo.clone_url, token);
                 await exec.exec('git', ['push', url, 'HEAD']);
             });
+            if (start_if_changed) {
+                core.info('pre-commit changed files, starting new run of this workflow for new commit');
+                const workflow = github.context.workflow;
+                const ref = github.context.ref;
+                await octokit.actions.createWorkflowDispatch({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    workflow_id: workflow,
+                    ref,
+                });
+            }
+            if (cancel_if_changed) {
+                core.info('pre-commit changed files, cancelling workflow');
+                await octokit.actions.cancelWorkflowRun({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    run_id: github.context.runId,
+                });
+            }
         }
     }
 }
